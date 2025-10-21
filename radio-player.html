@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Calico - Live Stream</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .player-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+
+        .volume-control label {
+            color: #666;
+            font-weight: 600;
+            min-width: 70px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.playing {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.stopped {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .stream-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.85em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <h1>Radio Calico</h1>
+        <p class="subtitle">Live HLS Stream</p>
+
+        <audio id="audio" class="audio-player" controls></audio>
+
+        <div class="controls">
+            <button id="playBtn">Play</button>
+            <button id="stopBtn">Stop</button>
+        </div>
+
+        <div class="volume-control">
+            <label for="volume">Volume:</label>
+            <input type="range" id="volume" min="0" max="100" value="70">
+            <span id="volumeValue">70%</span>
+        </div>
+
+        <div id="status" class="status stopped">Ready to play</div>
+
+        <div class="stream-info">
+            Stream: HLS Lossless Quality
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audio');
+        const playBtn = document.getElementById('playBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const volumeSlider = document.getElementById('volume');
+        const volumeValue = document.getElementById('volumeValue');
+        const statusDiv = document.getElementById('status');
+        const streamUrl = 'https://d3d4yli4hf5bmh.cloudfront.net/hls/live.m3u8';
+
+        // Set initial volume
+        audio.volume = 0.7;
+
+        // Initialize HLS
+        function initPlayer() {
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    backBufferLength: 90
+                });
+
+                hls.loadSource(streamUrl);
+                hls.attachMedia(audio);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    updateStatus('Ready to play', 'stopped');
+                });
+
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        switch(data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                updateStatus('Network error - attempting to recover', 'error');
+                                hls.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                updateStatus('Media error - attempting to recover', 'error');
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                updateStatus('Fatal error - cannot play stream', 'error');
+                                hls.destroy();
+                                break;
+                        }
+                    }
+                });
+            } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+                // Safari native HLS support
+                audio.src = streamUrl;
+                updateStatus('Ready to play', 'stopped');
+            } else {
+                updateStatus('HLS is not supported in this browser', 'error');
+            }
+        }
+
+        // Update status display
+        function updateStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        // Play button
+        playBtn.addEventListener('click', function() {
+            updateStatus('Loading stream...', 'loading');
+            audio.play().then(() => {
+                updateStatus('Playing live', 'playing');
+            }).catch(error => {
+                updateStatus('Failed to play: ' + error.message, 'error');
+            });
+        });
+
+        // Stop button
+        stopBtn.addEventListener('click', function() {
+            audio.pause();
+            audio.currentTime = 0;
+            updateStatus('Stopped', 'stopped');
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('input', function() {
+            const volume = this.value;
+            audio.volume = volume / 100;
+            volumeValue.textContent = volume + '%';
+        });
+
+        // Audio event listeners
+        audio.addEventListener('playing', function() {
+            updateStatus('Playing live', 'playing');
+        });
+
+        audio.addEventListener('pause', function() {
+            updateStatus('Paused', 'stopped');
+        });
+
+        audio.addEventListener('waiting', function() {
+            updateStatus('Buffering...', 'loading');
+        });
+
+        audio.addEventListener('error', function() {
+            updateStatus('Error loading stream', 'error');
+        });
+
+        // Initialize player on page load
+        initPlayer();
+    </script>
+</body>
+</html>

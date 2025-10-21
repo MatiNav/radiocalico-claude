@@ -1,0 +1,391 @@
+:root {
+    --mint: #D8F2D5;
+    --forest-green: #1F4E23;
+    --teal: #38A29D;
+    --calico-orange: #EFA63C;
+    --charcoal: #231F20;
+    --cream: #F5EADA;
+    --white: #FFFFFF;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--white);
+    color: var(--charcoal);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+header {
+    background: #4A4A4A;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    width: 100%;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--cream);
+    margin: 0;
+    line-height: 1;
+}
+
+.player-card {
+    background: var(--white);
+    padding: 48px 24px;
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 540px 1fr;
+    gap: 64px;
+    max-width: 1400px;
+    margin: 0 auto;
+    align-items: start;
+    padding: 0 48px;
+}
+
+.audio-player {
+    width: 100%;
+    height: 54px;
+    border-radius: 12px;
+    outline: none;
+    background: #4A4A4A;
+}
+
+audio::-webkit-media-controls-panel {
+    background: #4A4A4A;
+    border-radius: 12px;
+}
+
+audio::-webkit-media-controls-enclosure {
+    background: #4A4A4A;
+    border-radius: 12px;
+}
+
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-mute-button {
+    filter: invert(1);
+}
+
+audio::-webkit-media-controls-timeline,
+audio::-webkit-media-controls-volume-slider {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+    color: white;
+}
+
+.status {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 400;
+    text-align: center;
+}
+
+.status.loading {
+    background: var(--mint);
+    color: var(--forest-green);
+}
+
+.status.playing {
+    background: var(--teal);
+    color: var(--white);
+}
+
+.status.error {
+    background: var(--calico-orange);
+    color: var(--charcoal);
+}
+
+.status.stopped {
+    background: var(--cream);
+    color: var(--charcoal);
+    border: 1px solid #CCC;
+}
+
+.stream-info {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--white);
+    border: 1px solid #E5E5E5;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: var(--charcoal);
+}
+
+.stream-info strong {
+    color: var(--forest-green);
+}
+
+@media (max-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        padding: 0 24px;
+    }
+
+    .album-art-container {
+        max-width: 540px;
+        margin: 0 auto;
+    }
+
+    .album-art {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+    }
+
+    .recently-played-inner {
+        padding: 0 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    header {
+        padding: 16px;
+    }
+
+    .player-card {
+        padding: 32px 16px;
+    }
+
+    .main-content {
+        padding: 0 16px;
+        gap: 32px;
+    }
+
+    .album-art-container {
+        max-width: 100%;
+    }
+
+    .track-artist {
+        font-size: 2rem;
+    }
+
+    .track-title {
+        font-size: 1.5rem;
+    }
+
+    .track-album {
+        font-size: 1rem;
+    }
+
+    .rating-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .rating-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .rating-btn {
+        flex: 1;
+    }
+
+    .recently-played-inner {
+        padding: 0 16px;
+    }
+
+    .recently-played {
+        padding: 32px 16px;
+    }
+}
+
+.album-art-container {
+    position: relative;
+}
+
+.album-art {
+    width: 540px;
+    height: 540px;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.year-badge {
+    display: none;
+}
+
+.track-details {
+    padding-top: 0;
+}
+
+.track-artist {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--charcoal);
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.1;
+}
+
+.track-title {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--charcoal);
+    font-size: 2.5rem;
+    font-weight: 400;
+    margin-bottom: 24px;
+    line-height: 1.2;
+}
+
+.track-album {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--charcoal);
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 32px;
+    line-height: 1.3;
+}
+
+.quality-info {
+    margin-bottom: 32px;
+}
+
+.quality-line {
+    color: #999;
+    font-size: 0.95rem;
+    font-style: italic;
+    margin: 4px 0;
+    line-height: 1.6;
+}
+
+.rating-section {
+    margin-top: 0;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.rating-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.rating-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 2rem;
+    padding: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.6;
+}
+
+.rating-btn:hover:not(:disabled) {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.rating-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.rating-btn.active-up,
+.rating-btn.active-down {
+    opacity: 1;
+}
+
+.rating-count {
+    font-size: 1rem;
+    color: var(--charcoal);
+    font-weight: 400;
+}
+
+.rating-label {
+    color: var(--charcoal);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.recently-played {
+    background: var(--mint);
+    padding: 48px 24px;
+    margin-top: 48px;
+}
+
+.recently-played-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 48px;
+}
+
+.recently-played h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 24px;
+    font-size: 1.75rem;
+    line-height: 1.3;
+}
+
+.recent-track {
+    color: var(--charcoal);
+    margin-bottom: 12px;
+    font-size: 1.125rem;
+    line-height: 1.6;
+}
+
+.recent-track-artist {
+    font-weight: 600;
+    color: var(--charcoal);
+}
+
+.recent-track-title {
+    font-weight: 400;
+    color: var(--charcoal);
+}
+
+.loading-metadata {
+    color: var(--charcoal);
+    font-style: italic;
+    text-align: center;
+    padding: 32px;
+    opacity: 0.6;
+}

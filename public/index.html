@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Calico - Live Lossless Audio Stream</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="/logo.png" alt="Radio Calico Logo">
+        </div>
+        <h1>Radio Calico</h1>
+    </header>
+
+        <div class="player-card">
+            <div class="main-content">
+                <div class="album-art-container" id="albumArtContainer">
+                    <img src="https://d3d4yli4hf5bmh.cloudfront.net/cover.jpg" alt="Album Art" class="album-art" id="albumArt">
+                    <div class="year-badge" id="yearBadge">1983</div>
+                </div>
+
+                <div class="track-details" id="trackDetails">
+                    <div class="track-artist" id="trackArtist">Loading...</div>
+                    <div class="track-title" id="trackTitle">Loading...</div>
+                    <div class="track-album" id="trackAlbum">...</div>
+
+                    <div class="quality-info">
+                        <div class="quality-line" id="sourceQuality">Source quality: 16-bit 44.1kHz</div>
+                        <div class="quality-line" id="streamQuality">Stream quality: 48kHz FLAC / HLS Lossless</div>
+                    </div>
+
+                    <div class="rating-section">
+                        <span class="rating-label">Rate this track:</span>
+                        <button class="rating-btn" id="thumbsUpBtn" onclick="rateSong(1)">
+                            👍
+                        </button>
+                        <button class="rating-btn" id="thumbsDownBtn" onclick="rateSong(0)">
+                            👎
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 24px;">
+                        <audio id="audio" class="audio-player" controls></audio>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Recently Played Widget -->
+    <div class="recently-played">
+        <div class="recently-played-inner">
+            <h3>Previous tracks:</h3>
+            <div id="recentlyPlayedContent" class="loading-metadata">
+                Loading recent tracks...
+            </div>
+        </div>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>
