@@ -103,6 +103,9 @@ The database is automatically initialized when `app.py` starts (via `init_db()` 
 - **Metadata URL**: `https://d3d4yli4hf5bmh.cloudfront.net/metadatav2.json`
 - **Album Art URL**: `https://d3d4yli4hf5bmh.cloudfront.net/cover.jpg` (cache-busted with timestamp)
 - **Stream Quality**: 48kHz FLAC, lossless quality, variable source bit depth (16-bit or 24-bit)
+  - Source quality (bit depth and sample rate) is dynamically extracted from metadata and displayed in the UI
+  - JavaScript (`app.js`) fetches this information from the metadata endpoint and updates the display in real-time
+  - Fallback values: 16-bit, 44.1kHz if metadata is unavailable
 
 ### User Identification System
 The application uses browser fingerprinting (no login required):
