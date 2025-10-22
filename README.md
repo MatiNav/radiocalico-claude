@@ -54,6 +54,10 @@ python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
+# Optional: Install testing dependencies
+npm install --save-dev jest @types/jest jsdom
+uv pip install pytest pytest-flask pytest-cov
+
 # Start both servers (in separate terminals)
 # Terminal 1:
 source venv/bin/activate && python app.py
@@ -63,6 +67,9 @@ npm start
 
 # Open browser
 # Navigate to http://localhost:3000
+
+# Run tests (optional)
+npm run test:all
 ```
 
 ## 📋 Prerequisites
@@ -216,15 +223,25 @@ radiocalico/
 │   ├── styles.css                  # All styling (brand guidelines)
 │   ├── logo.png                    # Radio Calico logo
 │   └── favicon.ico                 # Site favicon
+├── tests/                           # Backend test suite
+│   ├── conftest.py                 # Pytest fixtures and configuration
+│   ├── test_ratings.py             # Rating system tests
+│   ├── test_api.py                 # API endpoint tests
+│   └── test_database.py            # Database operation tests
+├── tests/frontend/                  # Frontend test suite
+│   ├── ratings.test.js             # Rating submission tests
+│   ├── fingerprint.test.js         # Browser fingerprinting tests
+│   └── api.test.js                 # API integration tests
 ├── data/                            # Auto-created database directory (gitignored)
 │   └── users.db                    # SQLite database
 ├── venv/                            # Python virtual environment (gitignored)
 ├── app.py                           # Flask API server (port 5001)
 ├── server.js                        # Express static file server (port 3000)
-├── package.json                     # Node.js dependencies
+├── package.json                     # Node.js dependencies and scripts
 ├── package-lock.json                # Node.js dependency lockfile
 ├── requirements.txt                 # Python dependencies
 ├── .gitignore                       # Git ignore rules
+├── TESTING.md                       # Comprehensive testing documentation
 ├── CLAUDE.md                        # AI assistant project guidelines
 ├── RadioCalico_Style_Guide.txt      # Brand guidelines
 └── README.md                        # This file
@@ -257,6 +274,100 @@ python app.py  # Will recreate the database
 ### CORS Errors
 
 Make sure both servers are running and that the Flask server has `flask-cors` installed.
+
+## 🧪 Testing
+
+The project includes comprehensive unit tests for both frontend and backend rating systems.
+
+### Install Testing Dependencies
+
+**Backend (Python):**
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Install with uv (recommended)
+uv pip install pytest pytest-flask pytest-cov
+
+# Or with pip
+pip install pytest pytest-flask pytest-cov
+```
+
+**Frontend (JavaScript):**
+```bash
+npm install --save-dev jest @types/jest jsdom
+```
+
+### Running Tests
+
+**Frontend Tests (Jest):**
+```bash
+# Run all frontend tests
+npm test
+# or
+npm run test:frontend
+
+# Watch mode (auto-rerun on changes)
+npm run test:watch
+
+# With coverage report
+npm run test:coverage
+```
+
+**Backend Tests (pytest):**
+```bash
+# Activate virtual environment first
+source venv/bin/activate
+
+# Run all backend tests
+uv run pytest
+
+# With verbose output
+uv run pytest -v
+
+# With coverage report
+uv run pytest --cov=app --cov-report=html
+
+# Run specific test file
+uv run pytest tests/test_ratings.py
+```
+
+**Run All Tests:**
+```bash
+# Run both frontend and backend tests sequentially
+npm run test:all
+```
+
+### Test Structure
+
+```
+radiocalico/
+├── tests/                       # Backend tests
+│   ├── conftest.py             # Pytest fixtures
+│   ├── test_ratings.py         # Rating system tests
+│   ├── test_api.py             # API endpoint tests
+│   └── test_database.py        # Database tests
+└── tests/frontend/              # Frontend tests
+    ├── ratings.test.js         # Rating submission tests
+    ├── fingerprint.test.js     # Browser fingerprinting tests
+    └── api.test.js             # API integration tests
+```
+
+### What Tests Cover
+
+**Backend:**
+- Rating CRUD operations (create, read, update)
+- API endpoint validation
+- Database operations and constraints
+- Error handling and edge cases
+
+**Frontend:**
+- Browser fingerprinting consistency
+- Rating submission and API calls
+- UI state management
+- Error handling and network failures
+
+For detailed testing strategy and examples, see [TESTING.md](./TESTING.md).
 
 ## 🤝 Contributing
 
