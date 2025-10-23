@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Flask backend for development
+  flask-api:
+    build:
+      context: .
+      target: development
+    container_name: radiocalico-flask-dev
+    command: python3 app.py
+    ports:
+      - "5001:5001"
+    volumes:
+      # Mount source code for live reloading
+      - ./app.py:/app/app.py
+      - ./data:/app/data
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/metadata"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Express frontend for development
+  express-server:
+    build:
+      context: .
+      target: development
+    container_name: radiocalico-express-dev
+    command: node server.js
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for live reloading
+      - ./server.js:/app/server.js
+      - ./public:/app/public
+    environment:
+      - NODE_ENV=development
+      - FLASK_HOST=flask-api
+      - FLASK_PORT=5001
+    depends_on:
+      - flask-api
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

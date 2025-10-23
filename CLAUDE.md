@@ -60,6 +60,37 @@ The frontend is organized with separation of concerns:
 ## Development Commands
 
 ### Starting the Application
+
+#### Option 1: Docker (Recommended)
+
+**Development Mode:**
+```bash
+docker-compose -f docker-compose.dev.yml up
+```
+This starts both Flask and Express servers in separate containers with live code reloading:
+- Flask API: http://localhost:5001
+- Express Frontend: http://localhost:3000
+
+To stop: `Ctrl+C` or `docker-compose -f docker-compose.dev.yml down`
+
+**Production Mode:**
+```bash
+docker-compose up -d
+```
+This starts a single container with nginx reverse proxy, Flask backend, and Express frontend:
+- Application: http://localhost (port 80)
+
+To stop: `docker-compose down`
+
+**Rebuild after changes:**
+```bash
+docker-compose build
+# or for development
+docker-compose -f docker-compose.dev.yml build
+```
+
+#### Option 2: Manual (Without Docker)
+
 The application requires two separate terminal windows running simultaneously:
 
 **Terminal 1: Flask Backend**
@@ -147,17 +178,69 @@ radiocalico/
 ├── package.json                 # Node.js dependencies (express, cors, dotenv, better-sqlite3, http-proxy-middleware)
 ├── requirements.txt             # Python dependencies (flask, flask-cors)
 ├── venv/                        # Python virtual environment (not in git)
+├── Dockerfile                   # Multi-stage Docker build configuration
+├── docker-compose.yml           # Production deployment with nginx
+├── docker-compose.dev.yml       # Development deployment (separate containers)
+├── nginx.conf                   # Nginx reverse proxy configuration
+├── supervisord.conf             # Process manager for production container
+├── .dockerignore                # Files to exclude from Docker builds
 ├── radio-player.html            # Standalone player prototype (not used in production)
 ├── RadioCalico_Style_Guide.txt  # Brand guidelines
 ├── CLAUDE.md                    # AI assistant project guidelines (this file)
 └── README.md                    # Manual setup and run instructions
 ```
 
+## Docker Deployment
+
+### Container Architecture
+
+**Production Container:**
+- Single container running nginx, Flask, and Express via supervisord
+- nginx acts as reverse proxy on port 80
+- Flask runs on internal port 5001
+- Express runs on internal port 3000
+- All services managed by supervisord for automatic restarts
+
+**Development Containers:**
+- Separate containers for Flask (port 5001) and Express (port 3000)
+- Source code mounted as volumes for live reloading
+- Direct port access for debugging
+
+### Volume Persistence
+The `data/` directory is mounted as a volume to persist the SQLite database across container restarts.
+
+### Building and Deployment
+
+**Quick Start (Production):**
+```bash
+docker-compose up -d        # Start in background
+docker-compose logs -f      # View logs
+docker-compose down         # Stop and remove
+```
+
+**Quick Start (Development):**
+```bash
+docker-compose -f docker-compose.dev.yml up    # Start with logs
+docker-compose -f docker-compose.dev.yml down  # Stop and remove
+```
+
+**Manual Docker Build:**
+```bash
+# Production
+docker build --target production -t radiocalico:prod .
+docker run -d -p 80:80 -v ./data:/app/data radiocalico:prod
+
+# Development
+docker build --target development -t radiocalico:dev .
+docker run -d -p 5001:5001 -p 3000:3000 -v ./data:/app/data radiocalico:dev
+```
+
 ## Important Notes
 - **Frontend Code Organization**: The frontend follows separation of concerns with HTML (`index.html`), CSS (`styles.css`), and JavaScript (`app.js`) in separate files
 - **Backend Database**: SQLite with Flask for the API layer
-- **Server Execution**: Both servers (Flask and Express) run in the foreground in separate terminals for easy management and debugging
+- **Server Execution (Manual)**: Both servers (Flask and Express) run in the foreground in separate terminals for easy management and debugging
+- **Server Execution (Docker)**: Production uses supervisord to manage all processes; development uses separate containers
 - **Metadata Polling**: The system fetches track info every 10 seconds and updates the UI dynamically
 - **Song IDs**: Generated as base64-encoded strings from `artist-title` combinations
 - **Rating Updates**: Users can change their rating for the same song (UPDATE instead of INSERT when rating exists)
-- **Proxy Configuration**: Express proxies `/api/*` requests to Flask backend at port 5001
+- **Proxy Configuration**: Express proxies `/api/*` requests to Flask backend at port 5001 (manual) or nginx handles routing (Docker production)
