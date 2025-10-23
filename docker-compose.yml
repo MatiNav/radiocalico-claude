@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # Production deployment with nginx reverse proxy
+  radiocalico:
+    build:
+      context: .
+      target: production
+    container_name: radiocalico-prod
+    ports:
+      - "80:80"
+    volumes:
+      # Persist database across container restarts
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - FLASK_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/metadata"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
