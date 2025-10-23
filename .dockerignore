@@ -1,0 +1,53 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Python virtual environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Database (will be mounted as volume)
+data/*.db
+data/*.db-journal
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation (not needed in container)
+README.md
+CLAUDE.md
+RadioCalico_Style_Guide.txt
+RadioCalicoLogoTM.png
+
+# Development files
+radio-player.html
+
+# Docker files (not needed inside container)
+Dockerfile
+docker-compose.yml
+docker-compose.dev.yml
+.dockerignore
+
+# Environment files
+.env
+.env.local
+
+# Logs
+*.log
+logs/
