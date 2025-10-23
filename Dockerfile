@@ -1,35 +1,7 @@
 # Multi-stage Dockerfile for Radio Calico
 # Supports both development and production builds
 
-# Stage 1: Base Python image with Flask backend
-FROM python:3.11-slim as python-base
-
-WORKDIR /app
-
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy Flask application
-COPY app.py .
-
-# Create data directory for SQLite database
-RUN mkdir -p data
-
-# Stage 2: Base Node.js image with Express frontend
-FROM node:18-slim as node-base
-
-WORKDIR /app
-
-# Install Node.js dependencies
-COPY package*.json .
-RUN npm ci --only=production
-
-# Copy Express server and public files
-COPY server.js .
-COPY public/ ./public/
-
-# Stage 3: Development image (includes both Python and Node.js)
+# Stage 1: Development image (includes both Python and Node.js)
 FROM python:3.11-slim as development
 
 WORKDIR /app
@@ -66,12 +38,16 @@ EXPOSE 3000 5001
 # Development runs both servers using a process manager
 # In dev mode, we'll use docker-compose to run them separately for easier debugging
 
-# Stage 4: Production image with nginx reverse proxy
+# Stage 2: Production image with nginx reverse proxy
 FROM nginx:alpine as production
 
 # Install Python, Node.js, and build tools for better-sqlite3
 RUN apk add --no-cache python3 py3-pip nodejs npm supervisor \
     build-base python3-dev
+
+# Create non-root user for running application services
+RUN addgroup -g 1000 appuser && \
+    adduser -D -u 1000 -G appuser appuser
 
 WORKDIR /app
 
@@ -88,8 +64,9 @@ COPY app.py .
 COPY server.js .
 COPY public/ ./public/
 
-# Create data directory
-RUN mkdir -p data
+# Create data directory and set ownership
+RUN mkdir -p data && \
+    chown -R appuser:appuser /app
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf

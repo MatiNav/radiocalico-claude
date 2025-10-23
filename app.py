@@ -17,20 +17,22 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# Request logging middleware
+# Request logging middleware (only in debug mode)
 @app.before_request
 def log_request_info():
-    timestamp = datetime.now().isoformat()
-    logger.info(f"[{timestamp}] Incoming Request:")
-    logger.info(f"  Method: {request.method}")
-    logger.info(f"  URL: {request.url}")
-    logger.info(f"  Path: {request.path}")
-    logger.info(f"  Query Params: {dict(request.args)}")
-    logger.info(f"  Headers: {dict(request.headers)}")
-    if request.is_json and request.get_json():
-        logger.info(f"  JSON Body: {request.get_json()}")
-    elif request.form:
-        logger.info(f"  Form Data: {dict(request.form)}")
+    # Only enable verbose logging in debug/development mode
+    if app.debug or os.environ.get("FLASK_ENV") == "development":
+        timestamp = datetime.now().isoformat()
+        logger.info(f"[{timestamp}] Incoming Request:")
+        logger.info(f"  Method: {request.method}")
+        logger.info(f"  URL: {request.url}")
+        logger.info(f"  Path: {request.path}")
+        logger.info(f"  Query Params: {dict(request.args)}")
+        logger.info(f"  Headers: {dict(request.headers)}")
+        if request.is_json and request.get_json():
+            logger.info(f"  JSON Body: {request.get_json()}")
+        elif request.form:
+            logger.info(f"  Form Data: {dict(request.form)}")
 
 
 def get_db_connection():
