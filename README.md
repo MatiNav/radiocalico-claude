@@ -43,11 +43,29 @@ This application uses a **dual-server architecture**:
 
 ## 🚀 Quick Start
 
+### Using Makefile (Recommended)
+
 ```bash
 # Clone the repository
 git clone <your-repo-url>
 cd radiocalico
 
+# Install all dependencies
+make install
+
+# Start Docker development mode
+make docker-dev
+
+# Or start production mode
+make prod
+
+# View all available commands
+make help
+```
+
+### Manual Setup
+
+```bash
 # Install dependencies
 npm install
 python3 -m venv venv
@@ -70,6 +88,9 @@ npm start
 
 # Run tests (optional)
 npm run test:all
+
+# Run security scan
+make security-test
 ```
 
 ## 📋 Prerequisites
@@ -237,11 +258,21 @@ radiocalico/
 ├── venv/                            # Python virtual environment (gitignored)
 ├── app.py                           # Flask API server (port 5001)
 ├── server.js                        # Express static file server (port 3000)
+├── Dockerfile                       # Multi-stage Docker build
+├── docker-compose.yml               # Production Docker deployment
+├── docker-compose.dev.yml           # Development Docker deployment
+├── nginx.conf                       # Nginx reverse proxy config
+├── supervisord.conf                 # Process manager config
+├── Makefile                         # Build automation and commands
 ├── package.json                     # Node.js dependencies and scripts
 ├── package-lock.json                # Node.js dependency lockfile
 ├── requirements.txt                 # Python dependencies
 ├── .gitignore                       # Git ignore rules
+├── .dockerignore                    # Docker build exclusions
 ├── TESTING.md                       # Comprehensive testing documentation
+├── SECURITY.md                      # Security guidelines and scanning
+├── DOCKER_GUIDE.md                  # Docker deployment guide
+├── DOCKER_QUICK_START.md            # Docker quick reference
 ├── CLAUDE.md                        # AI assistant project guidelines
 ├── RadioCalico_Style_Guide.txt      # Brand guidelines
 └── README.md                        # This file
@@ -387,11 +418,35 @@ Contributions are welcome! Please follow these steps:
 - Rating system uses browser fingerprinting (no login required)
 - Song IDs are base64-encoded from `artist-title` combinations
 
-## 🔒 Security Notes
+## 🔒 Security
+
+### Automated Security Scanning
+
+Run security audits for both Node.js and Python dependencies:
+
+```bash
+# Run all security tests
+make security-test
+
+# Run detailed audit with fix suggestions
+make security-audit
+
+# Run only npm audit
+make npm-audit
+
+# Run only Python audit
+make python-audit
+```
+
+### Security Best Practices
 
 - The `data/` directory is gitignored to prevent committing user data
 - Environment variables should be stored in `.env` file (gitignored)
 - CORS is configured to allow requests between frontend and backend
+- Production Docker image runs services as non-root user
+- Regular dependency updates recommended
+
+For detailed security information, see [SECURITY.md](./SECURITY.md).
 
 ## 📄 License
 
